@@ -98,14 +98,25 @@ fn quicksort<T: PartialOrd + std::fmt::Debug>(v: &mut [T]) {
     
     // ...
 
-    let smaller = 99999999; // Totally wrong – you should fix this.
+    let mut pivot_pos = 0;
+    let mut larger_pos = length - 1; 
+
+    while pivot_pos < larger_pos {
+        if v[pivot_pos] > v[pivot_pos + 1] {
+            v.swap(pivot_pos, pivot_pos + 1);
+            pivot_pos = pivot_pos + 1
+        } else {
+            v.swap(pivot_pos + 1, larger_pos);
+            larger_pos = larger_pos - 1
+        }
+    }
 
     // Sort all the items < pivot
-    quicksort(&mut v[0..smaller]);
+    quicksort(&mut v[0..pivot_pos]);
     // Sort all the items ≥ pivot, *not* including the
     // pivot value itself. If we don't include the +1
     // here you can end up in infinite recursions.
-    quicksort(&mut v[smaller+1..length]);
+    quicksort(&mut v[pivot_pos+1..length]);
 }
 
 // Mergesort can't be done "in place", so it needs to return a _new_
@@ -128,7 +139,7 @@ fn merge_sort<T: PartialOrd + std::marker::Copy + std::fmt::Debug>(v: &[T]) -> V
 
     let len = v.len();
     if len == 0 {
-        return Vec::<T>::new();
+        return Vec::<T>::new()
     }
     if len == 1 {
         let mut result = Vec::<T>::new();
@@ -158,7 +169,29 @@ fn merge<T: PartialOrd + std::marker::Copy + std::fmt::Debug>(xs: Vec<T>, ys: Ve
 
     // This is totally wrong and will not sort. You should replace it
     // with something useful. :)
-    return xs;
+
+    if xs.len() == 0 {
+        return ys;
+    }
+    let mut x_pos = 0;
+    if ys.len() == 0 {
+        return xs;
+    }
+    let mut y_pos = 0;
+    let mut output: Vec<T> = Vec::new();
+
+    
+    for i in 0..xs.len() + ys.len() {
+        if xs[x_pos] < ys[y_pos] {
+            output[i] = xs[x_pos];
+            x_pos = x_pos + 1
+        } else {
+            output[i] = ys[y_pos];
+            y_pos = y_pos + 1
+        }
+    }
+
+    return output;
 }
 
 fn is_sorted<T: PartialOrd>(slice: &[T]) -> bool {
