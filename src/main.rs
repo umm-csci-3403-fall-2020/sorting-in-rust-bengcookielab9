@@ -144,7 +144,7 @@ fn merge_sort<T: PartialOrd + std::marker::Copy + std::fmt::Debug>(v: &[T]) -> V
     if len == 1 {
         let mut result = Vec::<T>::new();
         result.push(v[0]);
-        return result;
+        return result
     }
     let middle = v.len() / 2; //rounds down by default
     let left = merge_sort(&v[0..middle]);
@@ -167,9 +167,6 @@ fn merge<T: PartialOrd + std::marker::Copy + std::fmt::Debug>(xs: Vec<T>, ys: Ve
     // vector, and then push all the remaining elements from the
     // other vector onto the result.
 
-    // This is totally wrong and will not sort. You should replace it
-    // with something useful. :)
-
     if xs.len() == 0 {
         return ys;
     }
@@ -181,12 +178,13 @@ fn merge<T: PartialOrd + std::marker::Copy + std::fmt::Debug>(xs: Vec<T>, ys: Ve
     let mut output: Vec<T> = Vec::new();
 
     
-    for i in 0..xs.len() + ys.len() {
-        if xs[x_pos] < ys[y_pos] {
-            output[i] = xs[x_pos];
+    for _i in 0..xs.len() + ys.len() {
+        
+        if x_pos < xs.len() && (y_pos >= ys.len() || xs[x_pos] < ys[y_pos]) {
+            output.push(xs[x_pos]);
             x_pos = x_pos + 1
         } else {
-            output[i] = ys[y_pos];
+            output.push(ys[y_pos]);
             y_pos = y_pos + 1
         }
     }
