@@ -72,8 +72,8 @@ fn insertion_sort<T: PartialOrd + std::fmt::Debug>(v: &mut [T]) {
 // and slices of the array for debugging purposes with `{:?}`. I
 // don't do that here, but you could add some print statements if,
 // for example, you want to watch the sorting happen.
-fn quicksort<T: PartialOrd + std::fmt::Debug>(v: &mut [T]) {
-    // Quicksort is a recursive solution where we select a pivot
+
+// Quicksort is a recursive solution where we select a pivot
     // value (usually just the first element) and split (in place)
     // the array into two sections: The "front" is all < the pivot,
     // and the "back" is all ≥ pivot. More formally, there's an
@@ -87,25 +87,38 @@ fn quicksort<T: PartialOrd + std::fmt::Debug>(v: &mut [T]) {
     // are smaller than the original array; without it you can
     // end up with infinite recursion.)
 
+/*
+Our quicksort method chooses the pivot to be the first value of a vector. In a while loop, it then
+compares the pivot value to the value to the immediate right of the pivot. What the loop essentially does is shift the 
+pivot value to the right until it reaches a place where the values to the right of the pivot are larger than the 
+pivot's value. Then it recusrively calls itself
+*/
+fn quicksort<T: PartialOrd + std::fmt::Debug>(v: &mut [T]) {
+
     let length = v.len();
-    // If the array has 0 or 1 elements it's already sorted
-    // and we'll just stop.
-    if length < 2 {
+    if length < 2 { //If the array has 0 or 1 elements, it's already sorted and we can stop
         return;
     }
 
-    // Now choose a pivot and do the organizing.
-    
-    // ...
+    let mut pivot_pos = 0; //choosing the pivot to be at the beginning of the vector
+    let mut larger_pos = length - 1; 
 
-    let smaller = 99999999; // Totally wrong – you should fix this.
+    while pivot_pos < larger_pos { //comparing the value at the pivot position to the position next to it
+        if v[pivot_pos] > v[pivot_pos + 1] {  
+            v.swap(pivot_pos, pivot_pos + 1); 
+            pivot_pos = pivot_pos + 1
+        } else {
+            v.swap(pivot_pos + 1, larger_pos);
+            larger_pos = larger_pos - 1
+        }
+    }
 
     // Sort all the items < pivot
-    quicksort(&mut v[0..smaller]);
+    quicksort(&mut v[0..pivot_pos]); 
     // Sort all the items ≥ pivot, *not* including the
     // pivot value itself. If we don't include the +1
     // here you can end up in infinite recursions.
-    quicksort(&mut v[smaller+1..length]);
+    quicksort(&mut v[pivot_pos+1..length]);
 }
 
 // Mergesort can't be done "in place", so it needs to return a _new_
@@ -119,21 +132,22 @@ fn quicksort<T: PartialOrd + std::fmt::Debug>(v: &mut [T]) {
 // Note, however, that this has significant consequences – we can use `merge_sort`
 // to sort things like numbers, but sorting "large" things (e.g., student records)
 // would involve copying them, and that's likely to be expensive and perhaps undesirable.
-fn merge_sort<T: PartialOrd + std::marker::Copy + std::fmt::Debug>(v: &[T]) -> Vec<T> {
-    // Mergesort is a recursive solution where we split the
-    // array in half (slices make this easy), sort each half,
-    // and then merge the results together. All the "interesting"
-    // work is in the merge here, where in quicksort the "interesting"
-    // work is in organizing around the pivot.
 
+// Mergesort is a recursive solution where we split the
+// array in half (slices make this easy), sort each half,
+// and then merge the results together. All the "interesting"
+// work is in the merge here, where in quicksort the "interesting"
+// work is in organizing around the pivot.
+
+fn merge_sort<T: PartialOrd + std::marker::Copy + std::fmt::Debug>(v: &[T]) -> Vec<T> {
     let len = v.len();
     if len == 0 {
-        return Vec::<T>::new();
+        return Vec::<T>::new()
     }
     if len == 1 {
         let mut result = Vec::<T>::new();
         result.push(v[0]);
-        return result;
+        return result
     }
     let middle = v.len() / 2; //rounds down by default
     let left = merge_sort(&v[0..middle]);
@@ -142,23 +156,47 @@ fn merge_sort<T: PartialOrd + std::marker::Copy + std::fmt::Debug>(v: &[T]) -> V
     return result
 }
 
-fn merge<T: PartialOrd + std::marker::Copy + std::fmt::Debug>(xs: Vec<T>, ys: Vec<T>) -> Vec<T> {
-    // This takes two sorted vectors, like:
-    //    <5, 8, 9> and
-    //    <0, 2, 3, 6>
-    // and merges them into a single sorted vector like:
-    //    <0, 2, 3, 5, 6, 8, 9>
-    // You should be able to do this in linear time by having
-    // two indices that point to where you are in xs and ys.
-    // You then compare those values, push the smaller one onto
-    // the result vector, and increment the appropriate index.
-    // You stop when one of your indices hits the end of its
-    // vector, and then push all the remaining elements from the
-    // other vector onto the result.
+// This takes two sorted vectors, like:
+//    <5, 8, 9> and
+//    <0, 2, 3, 6>
+// and merges them into a single sorted vector like:
+//    <0, 2, 3, 5, 6, 8, 9>
+// You should be able to do this in linear time by having
+// two indices that point to where you are in xs and ys.
+// You then compare those values, push the smaller one onto
+// the result vector, and increment the appropriate index.
+// You stop when one of your indices hits the end of its
+// vector, and then push all the remaining elements from the
+// other vector onto the result.
 
-    // This is totally wrong and will not sort. You should replace it
-    // with something useful. :)
-    return xs;
+/*
+The interesting part of this method is in the for loop. We compare values in the xs subarray to values in the ys subarray
+and add the smaller one to the output vector. The condition y_pos >= ys.len() is so that we don't go out of bounds on the
+ys subarray.
+*/
+fn merge<T: PartialOrd + std::marker::Copy + std::fmt::Debug>(xs: Vec<T>, ys: Vec<T>) -> Vec<T> {
+    if xs.len() == 0 { //returning the sorted ys subarray if the xs subarray is empty
+        return ys; 
+    }
+    let mut x_pos = 0;
+    if ys.len() == 0 { //returning the sorted xs subarray if the ys subarray is empty
+        return xs;
+    }
+    let mut y_pos = 0;
+    let mut output: Vec<T> = Vec::new();
+
+    
+    for _i in 0..xs.len() + ys.len() {
+        if x_pos < xs.len() && (y_pos >= ys.len() || xs[x_pos] < ys[y_pos]) { 
+            output.push(xs[x_pos]);
+            x_pos = x_pos + 1
+        } else {
+            output.push(ys[y_pos]);
+            y_pos = y_pos + 1
+        }
+    }
+
+    return output;
 }
 
 fn is_sorted<T: PartialOrd>(slice: &[T]) -> bool {
